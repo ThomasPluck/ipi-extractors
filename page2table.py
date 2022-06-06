@@ -2,10 +2,10 @@ from tabula import read_pdf
 import pandas as pd
 
 def partition_on_word(dfs,word):
-    try:
-        clip = dfs.iloc[:,0].where(dfs.iloc[:,0].str.contains(word)).first_valid_index()
-    except:
-        clip = 0
+    clip = dfs.iloc[:,0].where(dfs.iloc[:,0].str.contains(word)).first_valid_index()
+
+    if clip == None:
+        return dfs
 
     return dfs.loc[clip+1:]
 
@@ -39,7 +39,7 @@ def read_table(rel_loc,page_num,incl_bool=True):
 
             # Create new columns for split rows
             for t in temp:
-                print(t)
+
                 dfs[l+n] = temp[t]
                 # Remember what we named these split rows
                 # and where they came from!
@@ -73,6 +73,8 @@ def read_table(rel_loc,page_num,incl_bool=True):
     dfs = dfs.T.reset_index(drop=True).T
 
     dfs[0] = dfs[0].str.split('(').str[0]
+
+    if not incl_bool: dfs = dfs.iloc[:,1:]
 
     # Get list to clipboard
     dfs.to_clipboard(excel=True, index=False, header=None)
